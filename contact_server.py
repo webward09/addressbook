@@ -31,6 +31,19 @@ class Contact():
         f.close()
         return address_book
 
+    def FindContact(self, searchmessage, rpc_controller):
+        address_book = addressbook_pb2.AddressBook()
+        f = open("addressbook.txt", "rb")
+        address_book.ParseFromString(f.read())
+        f.close()
+        for person in address_book.person:
+            if (person.name.strip() == searchmessage.text.strip()) :
+                return person
+        dummy = addressbook_pb2.Person()
+        dummy.id = 0
+        dummy.name = ""
+        return dummy
+
 def serve():
     server = addressbook_pb2.early_adopter_create_Contacts_server(Contact(), 50051, None, None)
     server.start()

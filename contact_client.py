@@ -5,19 +5,22 @@ _TIMEOUT_SECONDS = 10
 # Iterates though all people in the AddressBook and prints info about them.
 def ListPeople(address_book):
     for person in address_book.person:
-        print "\nPerson ID:", person.id
-        print "  Name:", person.name
-        if person.HasField('email'):
-            print "  E-mail address:", person.email
+        PrintPerson(person)
 
-        for phone_number in person.phone:
-            if phone_number.type == addressbook_pb2.Person.MOBILE:
-                print "  Mobile phone #:",
-            elif phone_number.type == addressbook_pb2.Person.HOME:
-                print "  Home phone #:",
-            elif phone_number.type == addressbook_pb2.Person.WORK:
-                print "  Work phone #:",
-            print phone_number.number
+def PrintPerson(person):
+    print "\nPerson ID:", person.id
+    print "  Name:", person.name
+    if person.HasField('email'):
+        print "  E-mail address:", person.email
+
+    for phone_number in person.phone:
+        if phone_number.type == addressbook_pb2.Person.MOBILE:
+            print "  Mobile phone #:",
+        elif phone_number.type == addressbook_pb2.Person.HOME:
+            print "  Home phone #:",
+        elif phone_number.type == addressbook_pb2.Person.WORK:
+            print "  Work phone #:",
+        print phone_number.number
 
 # This function fills in a Person message based on user input.
 def PromptForAddress(person):
@@ -54,7 +57,8 @@ with addressbook_pb2.early_adopter_create_Contacts_stub('localhost', 50051) as s
         print "Options:"
         print "  1) Add a Contact"
         print "  2) List all Contacts"
-        option = str(raw_input("Enter 1 or 2, or any other key to quit: "))
+        print "  3) Find a Contact"
+        option = str(raw_input("Enter 1, 2, 3, or any other key to quit: "))
         if ("1" == option):
             person = addressbook_pb2.Person()
             PromptForAddress(person)
@@ -63,5 +67,14 @@ with addressbook_pb2.early_adopter_create_Contacts_stub('localhost', 50051) as s
         elif ("2" == option):
             address_book = stub.ListContacts(message, _TIMEOUT_SECONDS)
             ListPeople(address_book)
+        elif ("3" == option):
+            searchname = str(raw_input("Enter the name of the contact to search for: "))
+            message.text = searchname
+            found = stub.FindContact(message, _TIMEOUT_SECONDS)
+            if not found.name :
+                print searchname + " not found."
+            else :
+                print searchname + " found:"
+                PrintPerson(found)
         else:
             break

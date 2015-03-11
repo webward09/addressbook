@@ -7,6 +7,9 @@ service Contacts {
 
   // List Contacts
   rpc ListContacts (TextMessage) returns (AddressBook) {}
+
+  // Find a Contact
+  rpc FindContact (TextMessage) returns (Person) {}
 }
 
 message Person {
